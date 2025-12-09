@@ -4,7 +4,7 @@ class UserModel {
   UserModel(this.id);
 
   String get friendlyId {
-    final suffix = id.length >= 6 ? id.substring(id.length - 6) : id;
-    return 'GRB-${suffix.toUpperCase()}';
+    final suffix = id.substring(id.length - 6).toUpperCase();
+    return 'GRB-$suffix';
   }
 }

@@ -1,33 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../app/app_routes.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
-
-  Future<void> _init() async {
-    final auth = context.read<AuthProvider>();
-    await auth.init();
-    await auth.mockLogin(); // simulate auto login
-  }
-
-  @override
   Widget build(BuildContext context) {
+    Future.microtask(() async {
+      final auth = context.read<AuthProvider>();
+      await auth.init();
+
+      if (auth.isLoggedIn) {
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      } else {
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      }
+    });
+
     return const Scaffold(
-      body: Center(
-        child: Text('GrabIt Day 0 Running ✅'),
-      ),
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 }

@@ -1,8 +1,15 @@
-import 'api_service.dart';
+class MockApiService {
+  Future<bool> mockRegister(String email, String password) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return true;
+  }
 
-class MockApiService implements ApiService {
-  @override
-  Future<bool> mockLogin() async {
+  Future<bool> mockVerify(String code) async {
+    await Future.delayed(const Duration(seconds: 1));
+    return code == '123456';
+  }
+
+  Future<bool> mockLogin(String email, String password) async {
     await Future.delayed(const Duration(seconds: 1));
     return true;
   }

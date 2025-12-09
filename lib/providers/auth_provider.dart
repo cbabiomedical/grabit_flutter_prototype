@@ -1,27 +1,66 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
+import '../services/mock_api_service.dart';
 import '../services/device_service.dart';
+import '../models/user_model.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final ApiService api;
+  final MockApiService api;
   final DeviceService deviceService;
 
+  bool _isLoading = false;
   bool _isLoggedIn = false;
-  String? _deviceId;
+  UserModel? _user;
 
+  bool get isLoading => _isLoading;
   bool get isLoggedIn => _isLoggedIn;
-  String? get deviceId => _deviceId;
+  UserModel? get user => _user;
 
   AuthProvider(this.api, this.deviceService);
 
   Future<void> init() async {
-    _deviceId = await deviceService.getOrCreateDeviceId();
-    notifyListeners();
+    await deviceService.getOrCreateDeviceId();
   }
 
-  Future<void> mockLogin() async {
-    final success = await api.mockLogin();
-    _isLoggedIn = success;
+  Future<bool> register(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+
+    final success = await api.mockRegister(email, password);
+
+    _isLoading = false;
+    notifyListeners();
+    return success;
+  }
+
+  Future<bool> verify(String code) async {
+    _isLoading = true;
+    notifyListeners();
+
+    final success = await api.mockVerify(code);
+
+    _isLoading = false;
+    notifyListeners();
+    return success;
+  }
+
+  Future<bool> login(String email, String password) async {
+    _isLoading = true;
+    notifyListeners();
+
+    final success = await api.mockLogin(email, password);
+    if (success) {
+      _user = UserModel('abcde123456');
+      _isLoggedIn = true;
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return success;
+  }
+
+  void logout() {
+    _isLoggedIn = false;
+    _user = null;
     notifyListeners();
   }
 }
