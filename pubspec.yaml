@@ -16,6 +16,8 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   http: ^1.6.0
   dio: ^5.9.0
+  google_maps_flutter: ^2.14.0
+  location: ^8.0.1
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
