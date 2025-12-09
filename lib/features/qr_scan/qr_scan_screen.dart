@@ -5,6 +5,13 @@ class QrScanScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('QR Scan (Day 6)'));
+    return const Scaffold(
+      body: Center(
+        child: Text(
+          'QR Scanner Activated',
+          style: TextStyle(fontSize: 20),
+        ),
+      ),
+    );
   }
 }

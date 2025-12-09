@@ -5,10 +5,13 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/promotion_provider.dart';
 import '../providers/points_provider.dart';
+import '../providers/beacon_provider.dart';
+import '../providers/settings_provider.dart';
 
 // Services
 import '../services/mock_api_service.dart';
 import '../services/device_service.dart';
+import '../services/beacon_service.dart';
 
 // Screens
 import '../features/splash/splash_screen.dart';
@@ -50,6 +53,14 @@ class GrabItApp extends StatelessWidget {
         // ✅ POINTS PROVIDER
         ChangeNotifierProvider(
           create: (_) => PointsProvider(mockApi),
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => SettingsProvider(),
+        ),
+
+        ChangeNotifierProvider(
+          create: (_) => BeaconProvider(BeaconService()),
         ),
       ],
       child: MaterialApp(
