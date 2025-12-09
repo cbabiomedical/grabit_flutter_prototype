@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/bottom_nav_bar.dart';
+import '../promotion/promotion_screen.dart';
+import '../qr_scan/qr_scan_screen.dart';
+import '../points/points_screen.dart';
+import '../settings/settings_screen.dart';
 import 'map_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,23 +16,26 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  int _index = 0;
 
-  final _tabs = const [
+  final _screens = const [
     _HomeTab(),
-    _PromoTab(),
-    _QrTab(),
-    _PointsTab(),
-    _SettingsTab(),
+    PromotionScreen(),
+    QrScanScreen(),
+    PointsScreen(),
+    SettingsScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+
     return Scaffold(
-      body: _tabs[_currentIndex],
+      appBar: AppBar(title: const Text('GrabIt')),
+      body: _screens[_index],
       bottomNavigationBar: BottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: (i) => setState(() => _currentIndex = i),
+        currentIndex: _index,
+        onTap: (i) => setState(() => _index = i),
       ),
     );
   }
@@ -39,46 +46,18 @@ class _HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().user;
+    final auth = context.watch<AuthProvider>();
 
-    return SafeArea(
-      child: Column(
-        children: [
-          const SizedBox(height: 16),
-          Text(
-            user?.friendlyId ?? '',
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          const Text("Scan QR at Machine"),
-          const SizedBox(height: 16),
-          const Expanded(child: MapWidget()),
-        ],
-      ),
+    return Column(
+      children: [
+        const SizedBox(height: 12),
+        Text(
+          auth.user?.friendlyId ?? '',
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
+        const Expanded(child: MapWidget()),
+      ],
     );
   }
-}
-
-class _PromoTab extends StatelessWidget {
-  const _PromoTab();
-  @override
-  Widget build(BuildContext context) => const Center(child: Text("Promotions"));
-}
-
-class _QrTab extends StatelessWidget {
-  const _QrTab();
-  @override
-  Widget build(BuildContext context) => const Center(child: Text("QR Scan"));
-}
-
-class _PointsTab extends StatelessWidget {
-  const _PointsTab();
-  @override
-  Widget build(BuildContext context) => const Center(child: Text("Points"));
-}
-
-class _SettingsTab extends StatelessWidget {
-  const _SettingsTab();
-  @override
-  Widget build(BuildContext context) => const Center(child: Text("Settings"));
 }
