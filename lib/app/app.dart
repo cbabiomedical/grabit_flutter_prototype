@@ -59,8 +59,15 @@ class GrabItApp extends StatelessWidget {
           create: (_) => SettingsProvider(),
         ),
 
+        // ChangeNotifierProvider(
+        //   create: (_) => BeaconProvider(BeaconService()),
+        // ),
+
         ChangeNotifierProvider(
-          create: (_) => BeaconProvider(BeaconService()),
+          create: (_) => BeaconProvider(
+            BeaconService(),
+            MockApiService(),
+          ),
         ),
       ],
       child: MaterialApp(

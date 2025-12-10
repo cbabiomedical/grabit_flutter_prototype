@@ -9,4 +9,5 @@ class AppRoutes {
   static const qr = '/qr';
   static const points = '/points';
   static const settings = '/settings';
+  static const beaconDebug = '/beacon-debug';
 }

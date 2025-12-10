@@ -1,22 +1,37 @@
 import 'dart:async';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 class BeaconService {
-  final StreamController<bool> _nearController =
-  StreamController<bool>.broadcast();
+  StreamSubscription<List<ScanResult>>? _scanSub;
+  bool isScanning = false;
 
-  Stream<bool> get nearStream => _nearController.stream;
+  static const int nearThreshold = -55;
 
-  Timer? _mockTimer;
+  void startScanning({
+    required Function(String mac, int rssi) onDetect,
+  }) {
+    if (isScanning) return;
+    isScanning = true;
 
-  void startMockScanning() {
-    _mockTimer = Timer.periodic(const Duration(seconds: 6), (timer) {
-      final isNear = timer.tick % 2 == 0; // FAR → NEAR toggle
-      _nearController.add(isNear);
+    FlutterBluePlus.startScan();
+
+    _scanSub = FlutterBluePlus.scanResults.listen((results) {
+      for (final r in results) {
+        final mac = r.device.remoteId.str;
+        final rssi = r.rssi;
+
+        if (rssi < -90) continue;
+
+        onDetect(mac, rssi);
+      }
     });
   }
 
   void stopScanning() {
-    _mockTimer?.cancel();
-    _mockTimer = null;
+    if (!isScanning) return;
+    isScanning = false;
+    FlutterBluePlus.stopScan();
+    _scanSub?.cancel();
+    _scanSub = null;
   }
 }

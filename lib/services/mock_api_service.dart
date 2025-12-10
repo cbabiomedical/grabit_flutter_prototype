@@ -17,6 +17,11 @@ class MockApiService {
     return true;
   }
 
+  Future<void> sendBeaconDetected(String mac, int rssi) async {
+    print("MOCK API → Beacon detected: MAC=$mac, RSSI=$rssi");
+    await Future.delayed(const Duration(milliseconds: 300));
+  }
+
   Future<List<PromotionModel>> getPromotions() async {
     await Future.delayed(const Duration(seconds: 1));
 
