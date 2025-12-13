@@ -10,6 +10,7 @@ import '../providers/settings_provider.dart';
 
 // Services
 import '../services/mock_api_service.dart';
+import '../services/real_api_service.dart';
 import '../services/device_service.dart';
 import '../services/beacon_service.dart';
 
@@ -17,7 +18,6 @@ import '../services/beacon_service.dart';
 import '../features/splash/splash_screen.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/register_screen.dart';
-import '../features/auth/verify_code_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/promotion/promotion_screen.dart';
 import '../features/points/points_screen.dart';
@@ -40,9 +40,9 @@ class GrabItApp extends StatelessWidget {
         // ✅ AUTH PROVIDER
         ChangeNotifierProvider(
           create: (_) => AuthProvider(
-            mockApi,
+            RealApiService(),
             deviceService,
-          ),
+          )..init(),
         ),
 
         // ✅ PROMOTION PROVIDER
@@ -79,7 +79,6 @@ class GrabItApp extends StatelessWidget {
           AppRoutes.splash: (_) => const SplashScreen(),
           AppRoutes.login: (_) => const LoginScreen(),
           AppRoutes.register: (_) => const RegisterScreen(),
-          AppRoutes.verify: (_) => const VerifyCodeScreen(),
           AppRoutes.home: (_) => const HomeScreen(),
           AppRoutes.promotions: (_) => const PromotionScreen(),
           AppRoutes.points: (_) => const PointsScreen(),

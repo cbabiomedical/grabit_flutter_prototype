@@ -20,27 +20,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _error;
 
   Future<void> _register() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
+    setState(() => _isLoading = true);
     final auth = context.read<AuthProvider>();
-    final success = await auth.register(
-      _email.text.trim(),
-      _password.text.trim(),
-    );
 
-    if (!mounted) return;
+    try {
+      final success = await auth.register(
+        _email.text.trim(),
+        _password.text.trim(),
+      );
 
-    setState(() => _isLoading = false);
+      if (!mounted) return;
 
-    if (success) {
-      Navigator.pushNamed(context, AppRoutes.verify);
-    } else {
+      if (success) {
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      }
+    } catch (e) {
       setState(() => _error = "Registration failed");
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
 
