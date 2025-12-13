@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../providers/auth_provider.dart';
 import '../../providers/beacon_provider.dart';
-import '../../services/mock_api_service.dart';
 import '../../widgets/bottom_nav_bar.dart';
 import '../promotion/promotion_screen.dart';
 import '../qr_scan/qr_scan_screen.dart';
@@ -45,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final beacon = context.watch<BeaconProvider>();
 
-    // 🔥 Auto-open QR screen when near
+    // Auto-open QR screen when near
     if (beacon.isNear) {
       Future.microtask(() {
         Navigator.pushNamed(context, AppRoutes.qr);
@@ -66,7 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Positioned(
               bottom: 110,
               right: 20,
-              child: _MachineNearbyBubble(),
+              child: _MachineNearbyBubble(
+                name: beacon.lastBeaconName ?? "Machine",
+              ),
             ),
         ],
       ),
@@ -105,6 +106,9 @@ class _HomeTab extends StatelessWidget {
 }
 
 class _MachineNearbyBubble extends StatelessWidget {
+  final String name;
+  const _MachineNearbyBubble({required this.name});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -114,20 +118,23 @@ class _MachineNearbyBubble extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [
           BoxShadow(
-            blurRadius: 6,
             color: Colors.black26,
+            blurRadius: 6,
             offset: Offset(0, 3),
           )
         ],
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.wifi_tethering, color: Colors.white, size: 18),
-          SizedBox(width: 6),
+          const Icon(Icons.wifi_tethering, color: Colors.white, size: 18),
+          const SizedBox(width: 6),
           Text(
-            "Machine nearby!",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            "Nearby: $name",
+            style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold
+            ),
           ),
         ],
       ),

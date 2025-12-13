@@ -1,69 +1,182 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import '../services/beacon_service.dart';
-import '../services/mock_api_service.dart';
+import '../services/real_api_service.dart';
+import 'auth_provider.dart';
 
 class BeaconProvider extends ChangeNotifier {
-  final BeaconService service;
-  final MockApiService api;
+  final BeaconService beaconService;
+  final RealApiService api;
 
-  String? lastBeaconId;
+  AuthProvider? auth; // injected via ProxyProvider
+
+  String? lastBeaconName;
+  String? lastBeaconMac;
   int lastRssi = -999;
+
   bool isNear = false;
-
   bool scanningEnabled = true;
-  bool _hasSentDetection = false;
 
-  Timer? _debounceTimer;
-
-  static const int nearThreshold = -55;
-
-  BeaconProvider(this.service, this.api);
-
-  void updateBeacon(String mac, int rssi) {
-    lastBeaconId = mac;
-    lastRssi = rssi;
-
-    final bool newIsNear = rssi >= nearThreshold;
-
-    // If near status changed → notify UI
-    if (newIsNear != isNear) {
-      isNear = newIsNear;
-      notifyListeners();
-    }
-
-    // Debounce + send to backend ONCE per detection burst
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(seconds: 1), () {
-      _sendBeaconDetectedOnce(mac, rssi);
-    });
+  BeaconProvider({
+    required this.beaconService,
+    required this.api,
+    required this.auth,
+  }) {
+    // Start BLE scanning
+    startScanning();
   }
 
-  // Prevent spamming 100s of API calls while beacon is nearby
-  Future<void> _sendBeaconDetectedOnce(String mac, int rssi) async {
-    if (_hasSentDetection) return;
+  void startScanning() {
+    if (!scanningEnabled) return;
 
-    _hasSentDetection = true;
-    await api.sendBeaconDetected(mac, rssi);
+    beaconService.startScanning(
+      onDetect: (name, mac, rssi) {
+        onBeaconDetected(name, mac, rssi);
+      },
+    );
+  }
 
-    // Reset after 10 seconds so user can move between machines
-    Timer(const Duration(seconds: 10), () {
-      _hasSentDetection = false;
-    });
+  void stopScanning() {
+    scanningEnabled = false;
+    beaconService.stopScanning();
+    notifyListeners();
+  }
+
+  Future<void> onBeaconDetected(String name, String mac, int rssi) async {
+    lastBeaconName = name;
+    lastBeaconMac = mac;
+    lastRssi = rssi;
+
+    final bucket = beaconService.getDistanceBucket(rssi);
+
+    final wasNear = isNear;
+    isNear = bucket == "NEAR";
+
+    // Notify UI only if state changed
+    if (isNear != wasNear) notifyListeners();
+
+    // Debug logs
+    print("DETECTED → name=$name mac=$mac rssi=$rssi bucket=$bucket");
+
+    // Must be logged in
+    if (auth == null || !auth!.isLoggedIn) return;
+    if (auth!.authToken == null) return;
+
+    try {
+      await api.sendBeaconDetected(
+        userId: auth!.user!.userId,
+        deviceId: auth!.user!.deviceId,
+        // beaconId: mac,
+        beaconId: name, // We now send BEACON NAME (CBA016)
+        rssi: rssi,
+        distanceBucket: bucket,
+        authToken: auth!.authToken!,
+      );
+      print("Beacon detected event sent to backend.");
+    } catch (e) {
+      // Ignore backend failures silently
+      print("Failed to send beacon-detected event.");
+    }
   }
 
   void setScanning(bool enabled) {
     scanningEnabled = enabled;
 
     if (enabled) {
-      service.startScanning(onDetect: (mac, rssi) {
-        updateBeacon(mac, rssi);
-      });
+      startScanning();
     } else {
-      service.stopScanning();
-      lastBeaconId = null;
-      isNear = false;
-      notifyListeners();
+      stopScanning();
     }
+
+    notifyListeners();
   }
 }
+
+
+// import 'package:flutter/material.dart';
+// import '../services/beacon_service.dart';
+// import '../services/real_api_service.dart';
+// import '../providers/auth_provider.dart';
+//
+// class BeaconProvider extends ChangeNotifier {
+//   final BeaconService beaconService;
+//   final RealApiService api;
+//   final AuthProvider auth;
+//
+//   String? lastBeaconId;
+//   int lastRssi = -999;
+//
+//   bool isNear = false;
+//   bool scanningEnabled = true;
+//
+//   BeaconProvider({
+//     required this.beaconService,
+//     required this.api,
+//     required this.auth,
+//   });
+//
+//   // ------------------------------------------------------------
+//   // START SCANNING
+//   // ------------------------------------------------------------
+//   void startScanning() {
+//     if (!scanningEnabled) return;
+//
+//     beaconService.startScanning(
+//       onDetect: (mac, rssi) {
+//         onBeaconDetected(mac, rssi);
+//       },
+//     );
+//   }
+//
+//   // ------------------------------------------------------------
+//   // STOP SCANNING
+//   // ------------------------------------------------------------
+//   void stopScanning() {
+//     beaconService.stopScanning();
+//   }
+//
+//   // ------------------------------------------------------------
+//   // HANDLE BEACON DETECTION
+//   // ------------------------------------------------------------
+//   Future<void> onBeaconDetected(String mac, int rssi) async {
+//     lastBeaconId = mac;
+//     lastRssi = rssi;
+//
+//     final bucket = beaconService.getDistanceBucket(rssi);
+//
+//     // Update UI state
+//     isNear = bucket == "NEAR";
+//     notifyListeners();
+//
+//     // We cannot call backend without being logged in
+//     if (!auth.isLoggedIn) return;
+//     if (auth.user == null) return;
+//
+//     try {
+//       await api.sendBeaconDetected(
+//         userId: auth.user!.userId,
+//         deviceId: auth.user!.deviceId,
+//         beaconId: mac,
+//         rssi: rssi,
+//         distanceBucket: bucket,
+//         authToken: auth.authToken!, // must exist after login
+//       );
+//     } catch (e) {
+//       // Fail silently for now to avoid UI errors
+//     }
+//   }
+//
+//   // ------------------------------------------------------------
+//   // SETTINGS: TOGGLE ON/OFF
+//   // ------------------------------------------------------------
+//   void setScanning(bool enabled) {
+//     scanningEnabled = enabled;
+//
+//     if (enabled) {
+//       startScanning();
+//     } else {
+//       stopScanning();
+//     }
+//
+//     notifyListeners();
+//   }
+// }

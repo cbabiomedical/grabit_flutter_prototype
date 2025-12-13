@@ -41,43 +41,69 @@ class SettingsScreen extends StatelessWidget {
 
           const Divider(height: 24),
 
-          // LAST BEACON INFO
+          // BEACON NAME
           ListTile(
-            title: const Text("Last Beacon ID"),
-            subtitle: Text(beacon.lastBeaconId ?? "No beacon detected yet"),
-            leading: const Icon(Icons.bluetooth_searching),
+            leading: const Icon(Icons.bluetooth),
+            title: const Text("Beacon Name"),
+            subtitle: Text(
+              beacon.lastBeaconName ?? "No beacon detected yet",
+            ),
           ),
 
+          // // LAST BEACON INFO
+          // ListTile(
+          //   title: const Text("Last Beacon ID"),
+          //   subtitle: Text(beacon.lastBeaconMac ?? "No beacon detected yet"),
+          //   leading: const Icon(Icons.bluetooth_searching),
+          // ),
+
+          // MAC ADDRESS
           ListTile(
-            title: const Text("Last RSSI"),
-            subtitle: Text(beacon.lastRssi == -999
-                ? "N/A"
-                : "${beacon.lastRssi} dBm"),
-            leading: const Icon(Icons.wifi_tethering),
+            leading: const Icon(Icons.qr_code_2),
+            title: const Text("Beacon MAC"),
+            subtitle: Text(
+              beacon.lastBeaconMac ?? "No beacon detected yet",
+            ),
           ),
+
+          // RSSI
+          ListTile(
+            leading: const Icon(Icons.wifi_tethering),
+            title: const Text("Last RSSI"),
+            subtitle: Text(
+              beacon.lastRssi == -999 ? "N/A" : "${beacon.lastRssi} dBm",
+            ),
+          ),
+
+          // ListTile(
+          //   title: const Text("Last RSSI"),
+          //   subtitle: Text(beacon.lastRssi == -999
+          //       ? "N/A"
+          //       : "${beacon.lastRssi} dBm"),
+          //   leading: const Icon(Icons.wifi_tethering),
+          // ),
 
           const SizedBox(height: 20),
 
           // MACHINE NEAR STATUS
           if (beacon.isNear)
             Container(
-              padding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.green.shade600,
-                borderRadius: BorderRadius.circular(12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade600,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text(
+                      "Machine nearby (Strong signal)",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ],
+                ),
               ),
-              child: const Row(
-                children: [
-                  Icon(Icons.check_circle, color: Colors.white),
-                  SizedBox(width: 8),
-                  Text(
-                    "Machine nearby (RSSI strong)",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );

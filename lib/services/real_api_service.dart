@@ -89,4 +89,37 @@ class RealApiService {
 
     return jsonDecode(response.body);
   }
+
+  // -----------------------------
+  // BEACON DETECTED
+  // -----------------------------
+  Future<void> sendBeaconDetected({
+    required String userId,
+    required String deviceId,
+    required String beaconId,
+    required int rssi,
+    required String distanceBucket,
+    required String authToken,
+  }) async {
+    final url = Uri.parse("$baseUrl/beacon/detected");
+
+    final response = await http.post(
+      url,
+      headers: {
+        "X-Auth-Token": authToken,
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "userId": userId,
+        "deviceId": deviceId,
+        "beaconId": beaconId,
+        "rssi": rssi,
+        "distanceBucket": distanceBucket,
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Beacon detected failed: ${response.body}");
+    }
+  }
 }

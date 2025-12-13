@@ -18,6 +18,8 @@ class AuthProvider extends ChangeNotifier {
   UserModel? get user => _user;
   bool get isLoggedIn => _isLoggedIn;
 
+  String? get authToken => _authToken;
+
   AuthProvider(this.api, this.deviceService);
 
   Future<void> init() async {

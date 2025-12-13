@@ -63,11 +63,19 @@ class GrabItApp extends StatelessWidget {
         //   create: (_) => BeaconProvider(BeaconService()),
         // ),
 
-        ChangeNotifierProvider(
+        // ---------------------------
+        // BEACON PROVIDER (depends on Auth)
+        // ---------------------------
+        ChangeNotifierProxyProvider<AuthProvider, BeaconProvider>(
           create: (_) => BeaconProvider(
-            BeaconService(),
-            MockApiService(),
+            beaconService: BeaconService(),
+            api: RealApiService(),
+            auth: null, // ← injected in update()
           ),
+          update: (_, auth, beaconProvider) {
+            beaconProvider!.auth = auth; // inject dependency
+            return beaconProvider;
+          },
         ),
       ],
       child: MaterialApp(
