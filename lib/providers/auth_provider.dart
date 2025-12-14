@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../services/real_api_service.dart';
 import '../services/device_service.dart';
+import '../services/fcm_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AuthProvider extends ChangeNotifier {
   final RealApiService api;
   final DeviceService deviceService;
+  final FcmService _fcmService = FcmService();
 
   final _storage = const FlutterSecureStorage();
 
@@ -84,6 +86,21 @@ class AuthProvider extends ChangeNotifier {
 
     _user = UserModel.fromJson(profile);
     _isLoggedIn = true;
+
+    await _fcmService.requestPermission();
+
+    final fcmToken = await _fcmService.getToken();
+    if (fcmToken != null) {
+      debugPrint("📱 FCM TOKEN: $fcmToken");
+      // TODO: send to backend if endpoint exists
+    }
+
+    _fcmService.listenTokenRefresh((newToken) {
+      debugPrint("🔄 FCM Token refreshed: $newToken");
+      // TODO: update backend
+    });
+
+    _fcmService.onForegroundMessage();
 
     notifyListeners();
     return true;

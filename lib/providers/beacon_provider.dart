@@ -16,6 +16,10 @@ class BeaconProvider extends ChangeNotifier {
   bool isNear = false;
   bool scanningEnabled = true;
 
+  //THROTTLING CONFIG
+  static const Duration beaconSendInterval = Duration(seconds: 60);
+  final Map<String, DateTime> _lastSentTime = {};
+
   BeaconProvider({
     required this.beaconService,
     required this.api,
@@ -52,14 +56,35 @@ class BeaconProvider extends ChangeNotifier {
     isNear = bucket == "NEAR";
 
     // Notify UI only if state changed
-    if (isNear != wasNear) notifyListeners();
+    if (isNear != wasNear) {
+      notifyListeners();
+    }
 
-    // Debug logs
-    print("DETECTED → name=$name mac=$mac rssi=$rssi bucket=$bucket");
+    // Debug log (always visible)
+    debugPrint(
+      "DETECTED → name=$name mac=$mac rssi=$rssi bucket=$bucket",
+    );
 
     // Must be logged in
     if (auth == null || !auth!.isLoggedIn) return;
     if (auth!.authToken == null) return;
+
+    // ⏱️ THROTTLING LOGIC (per beacon NAME)
+    final now = DateTime.now();
+    final lastSent = _lastSentTime[name];
+
+    if (lastSent != null &&
+        now.difference(lastSent) < beaconSendInterval) {
+      debugPrint(
+        "⏱️ Beacon skipped (throttled) → $name "
+            "(${now.difference(lastSent).inSeconds}s)",
+      );
+      return;
+    }
+
+    _lastSentTime[name] = now;
+
+    debugPrint("📡 Sending beacon-detected → $name");
 
     try {
       await api.sendBeaconDetected(
@@ -71,10 +96,10 @@ class BeaconProvider extends ChangeNotifier {
         distanceBucket: bucket,
         authToken: auth!.authToken!,
       );
-      print("Beacon detected event sent to backend.");
+      debugPrint("✅ Beacon detected event sent to backend.");
     } catch (e) {
       // Ignore backend failures silently
-      print("Failed to send beacon-detected event.");
+      debugPrint("✅ Beacon detected event sent to backend.");
     }
   }
 
