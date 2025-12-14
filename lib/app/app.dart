@@ -46,10 +46,10 @@ class GrabItApp extends StatelessWidget {
           )..init(),
         ),
 
-        // // ✅ POINTS PROVIDER
-        // ChangeNotifierProvider(
-        //   create: (_) => PointsProvider(mockApi),
-        // ),
+        // ✅ POINTS PROVIDER
+        ChangeNotifierProvider(
+          create: (_) => PointsProvider(mockApi),
+        ),
 
         ChangeNotifierProvider(
           create: (_) => SettingsProvider(),
