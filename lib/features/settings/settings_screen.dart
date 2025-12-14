@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/beacon_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../app/app_routes.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -8,6 +10,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final beacon = context.watch<BeaconProvider>();
+    final auth = context.read<AuthProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -115,6 +118,53 @@ class SettingsScreen extends StatelessWidget {
                   ],
                 ),
               ),
+
+          const Divider(height: 32),
+
+          // --------------------------
+          // LOGOUT
+          // --------------------------
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text(
+              "Logout",
+              style: TextStyle(color: Colors.red),
+            ),
+            onTap: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text("Logout"),
+                  content:
+                  const Text("Are you sure you want to logout?"),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx, false),
+                      child: const Text("Cancel"),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(ctx, true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      child: const Text("Logout"),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirm == true) {
+                await auth.logout();
+                if (context.mounted) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.login,
+                        (_) => false,
+                  );
+                }
+              }
+            },
+          ),
         ],
       ),
     );
