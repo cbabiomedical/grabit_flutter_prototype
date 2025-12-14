@@ -91,12 +91,12 @@ class AuthProvider extends ChangeNotifier {
 
     final fcmToken = await _fcmService.getToken();
     if (fcmToken != null) {
-      debugPrint("📱 FCM TOKEN: $fcmToken");
+      debugPrint("FCM TOKEN: $fcmToken");
       // TODO: send to backend if endpoint exists
     }
 
     _fcmService.listenTokenRefresh((newToken) {
-      debugPrint("🔄 FCM Token refreshed: $newToken");
+      debugPrint("FCM Token refreshed: $newToken");
       // TODO: update backend
     });
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/promotion_provider.dart';
-import 'package:intl/intl.dart';
+import '../../providers/auth_provider.dart';
 
 class PromotionScreen extends StatefulWidget {
   const PromotionScreen({super.key});
@@ -14,8 +14,22 @@ class _PromotionScreenState extends State<PromotionScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<PromotionProvider>().loadPromotions();
+    Future.microtask(() {
+      context.read<PromotionProvider>().fetchPromotions();
+    });
   }
+
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //
+  //   final provider = context.read<PromotionProvider>();
+  //   final auth = context.read<AuthProvider>();
+  //
+  //   if (auth.isLoggedIn && provider.promotions.isEmpty && !provider.isLoading) {
+  //     provider.fetchPromotions();
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -25,40 +39,31 @@ class _PromotionScreenState extends State<PromotionScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
+    if (provider.error != null) {
+      return Center(child: Text(provider.error!));
+    }
+
     if (provider.promotions.isEmpty) {
-      return const Center(child: Text('No active promotions.'));
+      return const Center(child: Text("No active promotions"));
     }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: provider.promotions.length,
-      itemBuilder: (_, i) {
-        final promo = provider.promotions[i];
-        final expiry = DateFormat('hh:mm a').format(promo.expiresAt);
+      itemBuilder: (context, index) {
+        final p = provider.promotions[index];
 
         return Card(
-          elevation: 3,
-          margin: const EdgeInsets.only(bottom: 16),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(promo.productName,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
-                Text('Machine: ${promo.machineName}'),
-                const SizedBox(height: 8),
-                Text('Original: Rs ${promo.basePrice}'),
-                Text('Discount: Rs ${promo.discountValue}'),
-                Text(
-                  'Now: Rs ${promo.discountedPrice}',
-                  style: const TextStyle(
-                      color: Colors.green, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 6),
-                Text('Expires at $expiry'),
-              ],
+          margin: const EdgeInsets.only(bottom: 12),
+          child: ListTile(
+            title: Text(p.product.name),
+            subtitle: Text(
+              "${p.discountType} • ${p.discountValue}% OFF",
+            ),
+            trailing: Text(
+              "Expires\n${p.expiresAt.toLocal().toString().split(' ').first}",
+              textAlign: TextAlign.right,
+              style: const TextStyle(fontSize: 12),
             ),
           ),
         );

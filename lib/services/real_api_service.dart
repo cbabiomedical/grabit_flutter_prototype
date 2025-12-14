@@ -146,4 +146,29 @@ class RealApiService {
       throw Exception("Beacon detected failed");
     }
   }
+
+  Future<List<dynamic>> getActivePromotions({
+    required String userId,
+    required String authToken,
+  }) async {
+    final url = Uri.parse(
+      "$baseUrl/promotions/active/$userId",
+    );
+
+    final response = await http.get(
+      url,
+      headers: {
+        "X-Auth-Token": authToken,
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Failed to load promotions: ${response.body}");
+    }
+
+    final decoded = jsonDecode(response.body);
+    return decoded['promotions'] as List<dynamic>;
+  }
+
 }

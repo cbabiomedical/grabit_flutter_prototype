@@ -96,10 +96,10 @@ class BeaconProvider extends ChangeNotifier {
         distanceBucket: bucket,
         authToken: auth!.authToken!,
       );
-      debugPrint("✅ Beacon detected event sent to backend.");
+      debugPrint("Beacon detected event sent to backend.");
     } catch (e) {
       // Ignore backend failures silently
-      debugPrint("✅ Beacon detected event sent to backend.");
+      debugPrint("Beacon detected event sent to backend.");
     }
   }
 

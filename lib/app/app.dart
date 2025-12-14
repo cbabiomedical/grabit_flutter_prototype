@@ -45,11 +45,6 @@ class GrabItApp extends StatelessWidget {
           )..init(),
         ),
 
-        // ✅ PROMOTION PROVIDER
-        ChangeNotifierProvider(
-          create: (_) => PromotionProvider(mockApi),
-        ),
-
         // ✅ POINTS PROVIDER
         ChangeNotifierProvider(
           create: (_) => PointsProvider(mockApi),
@@ -75,6 +70,14 @@ class GrabItApp extends StatelessWidget {
           update: (_, auth, beaconProvider) {
             beaconProvider!.auth = auth; // inject dependency
             return beaconProvider;
+          },
+        ),
+
+        ChangeNotifierProxyProvider<AuthProvider, PromotionProvider>(
+          create: (_) => PromotionProvider(api: RealApiService()),
+          update: (_, auth, promoProvider) {
+            promoProvider!.auth = auth;
+            return promoProvider;
           },
         ),
       ],

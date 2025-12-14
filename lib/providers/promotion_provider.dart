@@ -1,25 +1,51 @@
 import 'package:flutter/material.dart';
 import '../models/promotion_model.dart';
-import '../services/mock_api_service.dart';
+import '../services/real_api_service.dart';
+import 'auth_provider.dart';
 
 class PromotionProvider extends ChangeNotifier {
-  final MockApiService api;
+  final RealApiService api;
+  AuthProvider? auth;
 
-  PromotionProvider(this.api);
+  PromotionProvider({required this.api});
 
-  List<PromotionModel> _promotions = [];
-  bool _loading = false;
+  bool isLoading = false;
+  String? error;
+  List<PromotionModel> promotions = [];
 
-  List<PromotionModel> get promotions => _promotions;
-  bool get isLoading => _loading;
+  Future<void> fetchPromotions() async {
+    debugPrint("fetchPromotions() called");
 
-  Future<void> loadPromotions() async {
-    _loading = true;
+    if (auth == null || !auth!.isLoggedIn) {
+      debugPrint("❌ AuthProvider is NULL");
+      debugPrint("❌ User is NOT logged in");
+      return;
+    }
+
+    debugPrint("✅ Logged in as userId=${auth!.user!.userId}");
+    debugPrint("🔑 authToken=${auth!.authToken?.substring(0, 10)}...");
+
+    isLoading = true;
+    error = null;
     notifyListeners();
 
-    _promotions = await api.getPromotions();
+    try {
+      final list = await api.getActivePromotions(
+        userId: auth!.user!.userId,
+        authToken: auth!.authToken!,
+      );
 
-    _loading = false;
+      debugPrint("📦 Promotions received: ${list.length}");
+
+      promotions = list
+          .map((e) => PromotionModel.fromJson(e))
+          .toList();
+    } catch (e) {
+      debugPrint("❌ Promotions API error: $e");
+      error = "Failed to load promotions";
+    }
+
+    isLoading = false;
     notifyListeners();
   }
 }
