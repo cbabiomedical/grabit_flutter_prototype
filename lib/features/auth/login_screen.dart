@@ -69,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       // 🔰 HEADER
                       const Text(
-                        "GrabIt",
+                        "GRABIT",
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
