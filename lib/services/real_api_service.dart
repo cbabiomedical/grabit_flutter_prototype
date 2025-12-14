@@ -171,4 +171,33 @@ class RealApiService {
     return decoded['promotions'] as List<dynamic>;
   }
 
+  Future<Map<String, dynamic>> startSession({
+    required String userId,
+    required String deviceId,
+    required String machineId,
+    required String authToken,
+  }) async {
+    final url = Uri.parse("$baseUrl/beacon/session/start");
+
+    final response = await http.post(
+      url,
+      headers: {
+        "X-Auth-Token": authToken,
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "userId": userId,
+        "deviceId": deviceId,
+        "machineId": machineId, // AS-IS
+      }),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception("Session start failed: ${response.body}");
+    }
+
+    return jsonDecode(response.body);
+  }
+
+
 }

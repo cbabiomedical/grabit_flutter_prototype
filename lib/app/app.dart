@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/promotion_provider.dart';
 import '../providers/points_provider.dart';
+import '../providers/session_provider.dart';
 import '../providers/beacon_provider.dart';
 import '../providers/settings_provider.dart';
 
@@ -45,10 +46,10 @@ class GrabItApp extends StatelessWidget {
           )..init(),
         ),
 
-        // ✅ POINTS PROVIDER
-        ChangeNotifierProvider(
-          create: (_) => PointsProvider(mockApi),
-        ),
+        // // ✅ POINTS PROVIDER
+        // ChangeNotifierProvider(
+        //   create: (_) => PointsProvider(mockApi),
+        // ),
 
         ChangeNotifierProvider(
           create: (_) => SettingsProvider(),
@@ -80,6 +81,15 @@ class GrabItApp extends StatelessWidget {
             return promoProvider;
           },
         ),
+
+        ChangeNotifierProxyProvider<AuthProvider, SessionProvider>(
+          create: (_) => SessionProvider(api: RealApiService()),
+          update: (_, auth, sessionProvider) {
+            sessionProvider!.auth = auth;
+            return sessionProvider;
+          },
+        ),
+
       ],
       child: MaterialApp(
         title: 'GrabIt',
