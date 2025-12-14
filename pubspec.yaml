@@ -12,8 +12,10 @@ dependencies:
   flutter:
     sdk: flutter
 
+  firebase_core: ^4.2.1
+  firebase_messaging: ^16.0.4
   provider: ^6.1.5+1
-  flutter_secure_storage: ^9.2.4
+  flutter_secure_storage: ^10.0.0
   http: ^1.6.0
   dio: ^5.9.0
   google_maps_flutter: ^2.14.0

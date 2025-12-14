@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "307179399604",
+    "project_id": "grabitflutterprototype-435a1",
+    "storage_bucket": "grabitflutterprototype-435a1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:307179399604:android:192b6d0711ecede8a4aae1",
+        "android_client_info": {
+          "package_name": "com.example.grabit_flutter_prototype"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD233Kk9wX6Dg8ZGfJyTbeMrACsflxFI_4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

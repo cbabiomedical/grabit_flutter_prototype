@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -34,6 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _requestPermissions();
+    _printFcmToken();
+  }
+
+  void _printFcmToken() async {
+    final token = await FirebaseMessaging.instance.getToken();
+    debugPrint("🔥 FCM TOKEN: $token");
   }
 
   Future<void> _requestPermissions() async {
