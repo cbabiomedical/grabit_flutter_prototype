@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 class RealApiService {
@@ -101,7 +102,18 @@ class RealApiService {
     required String distanceBucket,
     required String authToken,
   }) async {
-    final url = Uri.parse("$baseUrl/beacon/detected");
+    final url = Uri.parse("$baseUrl/detected");
+
+    // -----------------------------
+    // 🔍 DEBUG: REQUEST LOGS
+    // -----------------------------
+    debugPrint("📡 Beacon API REQUEST");
+    debugPrint("userId=$userId");
+    debugPrint("deviceId=$deviceId");
+    debugPrint("beaconId=$beaconId");
+    debugPrint("rssi=$rssi");
+    debugPrint("distanceBucket=$distanceBucket");
+    debugPrint("authToken=${authToken.substring(0, 10)}...");
 
     final response = await http.post(
       url,
@@ -118,8 +130,20 @@ class RealApiService {
       }),
     );
 
-    if (response.statusCode != 200) {
-      throw Exception("Beacon detected failed: ${response.body}");
+    // -----------------------------
+    // 🔍 DEBUG: RESPONSE LOGS
+    // -----------------------------
+    debugPrint("📡 Beacon API RESPONSE ${response.statusCode}");
+    debugPrint("📡 Body: ${response.body}");
+
+    // if (response.statusCode != 200) {
+    //   throw Exception("Beacon detected failed: ${response.body}");
+    // }
+
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      debugPrint("❌ Beacon API error ${response.statusCode}");
+      debugPrint("❌ Response body: ${response.body}");
+      throw Exception("Beacon detected failed");
     }
   }
 }
