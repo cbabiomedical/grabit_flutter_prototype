@@ -39,6 +39,17 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
 
+          SwitchListTile(
+            title: const Text("Auto-open QR on machine detect"),
+            subtitle: const Text("Open QR scanner automatically"),
+            value: beacon.autoOpenQr,
+            onChanged: (v) {
+              beacon.autoOpenQr = v;
+              beacon.notifyListeners();
+            },
+          ),
+
+
           const Divider(height: 24),
 
           // BEACON NAME

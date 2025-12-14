@@ -16,8 +16,11 @@ class BeaconProvider extends ChangeNotifier {
   bool isNear = false;
   bool scanningEnabled = true;
 
+  bool autoOpenQr = true;
+  bool qrOpened = false;
+
   //THROTTLING CONFIG
-  static const Duration beaconSendInterval = Duration(seconds: 60);
+  static const Duration beaconSendInterval = Duration(seconds: 30);
   final Map<String, DateTime> _lastSentTime = {};
 
   BeaconProvider({
@@ -56,7 +59,8 @@ class BeaconProvider extends ChangeNotifier {
     isNear = bucket == "NEAR";
 
     // Notify UI only if state changed
-    if (isNear != wasNear) {
+    if (isNear && !wasNear) {
+      qrOpened = false; // reset on new approach
       notifyListeners();
     }
 

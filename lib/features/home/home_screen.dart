@@ -51,9 +51,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final beacon = context.watch<BeaconProvider>();
 
-    // Auto-open QR screen when near
-    if (beacon.isNear) {
-      Future.microtask(() {
+    // // Auto-open QR screen when near
+    // if (beacon.isNear) {
+    //   Future.microtask(() {
+    //     Navigator.pushNamed(context, AppRoutes.qr);
+    //   });
+    // }
+
+    if (beacon.isNear &&
+        beacon.autoOpenQr &&
+        !beacon.qrOpened) {
+      beacon.qrOpened = true;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushNamed(context, AppRoutes.qr);
       });
     }
