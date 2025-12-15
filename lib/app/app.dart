@@ -47,9 +47,9 @@ class GrabItApp extends StatelessWidget {
         ),
 
         // ✅ POINTS PROVIDER
-        ChangeNotifierProvider(
-          create: (_) => PointsProvider(mockApi),
-        ),
+        // ChangeNotifierProvider(
+        //   create: (_) => PointsProvider(mockApi),
+        // ),
 
         ChangeNotifierProvider(
           create: (_) => SettingsProvider(),
@@ -89,6 +89,15 @@ class GrabItApp extends StatelessWidget {
             return sessionProvider;
           },
         ),
+
+        ChangeNotifierProxyProvider<AuthProvider, PointsProvider>(
+          create: (_) => PointsProvider(api: RealApiService()),
+          update: (_, auth, provider) {
+            provider!.auth = auth;
+            return provider;
+          },
+        ),
+
 
       ],
       child: MaterialApp(

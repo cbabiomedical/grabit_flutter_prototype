@@ -1,5 +1,18 @@
 class PointsModel {
-  final int totalPoints;
+  final int loyaltyPoints;
 
-  PointsModel(this.totalPoints);
+  PointsModel({required this.loyaltyPoints});
+
+  factory PointsModel.fromJson(Map<String, dynamic> json) {
+    return PointsModel(
+      loyaltyPoints: json['loyaltyPoints'] ?? 0,
+    );
+  }
 }
+
+
+// class PointsModel {
+//   final int totalPoints;
+//
+//   PointsModel(this.totalPoints);
+// }

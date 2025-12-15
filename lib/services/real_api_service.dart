@@ -141,8 +141,8 @@ class RealApiService {
     // }
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      debugPrint("❌ Beacon API error ${response.statusCode}");
-      debugPrint("❌ Response body: ${response.body}");
+      debugPrint("Beacon API error ${response.statusCode}");
+      debugPrint("Response body: ${response.body}");
       throw Exception("Beacon detected failed");
     }
   }

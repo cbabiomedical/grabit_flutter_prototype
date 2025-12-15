@@ -47,8 +47,8 @@ class MockApiService {
   //   ];
   // }
 
-  Future<PointsModel> getUserPoints() async {
-    await Future.delayed(const Duration(seconds: 1));
-    return PointsModel(180);
-  }
+  // Future<PointsModel> getUserPoints() async {
+  //   await Future.delayed(const Duration(seconds: 1));
+  //   return PointsModel(0);
+  // }
 }

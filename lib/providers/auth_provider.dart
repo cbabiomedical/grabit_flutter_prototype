@@ -49,11 +49,19 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> register(String email, String password) async {
     final deviceId = await deviceService.getOrCreateDeviceId();
 
+    // Request permission
+    await _fcmService.requestPermission();
+
+    // Get FCM token
+    final fcmToken = await _fcmService.getToken();
+
+    debugPrint("FCM TOKEN SENT TO BACKEND: $fcmToken");
+
     final result = await api.register(
       email: email,
       password: password,
       deviceId: deviceId,
-      pushToken: "PUSH_TOKEN", // placeholder
+      pushToken: fcmToken ?? "", // placeholder
       platform: "android",
     );
 
@@ -63,11 +71,21 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> login(String email, String password) async {
     final deviceId = await deviceService.getOrCreateDeviceId();
 
+    // Request permission
+    await _fcmService.requestPermission();
+
+    // Get FCM token
+    final fcmToken = await _fcmService.getToken();
+
+    debugPrint("FCM TOKEN SENT TO BACKEND: $fcmToken");
+
+    // 3️⃣ Send token during login
+
     final result = await api.login(
       email: email,
       password: password,
       deviceId: deviceId,
-      pushToken: "PUSH_TOKEN",
+      pushToken: fcmToken ?? "",
       platform: "android",
     );
 
@@ -87,13 +105,13 @@ class AuthProvider extends ChangeNotifier {
     _user = UserModel.fromJson(profile);
     _isLoggedIn = true;
 
-    await _fcmService.requestPermission();
+    // await _fcmService.requestPermission();
 
-    final fcmToken = await _fcmService.getToken();
-    if (fcmToken != null) {
-      debugPrint("FCM TOKEN: $fcmToken");
-      // TODO: send to backend if endpoint exists
-    }
+    // final fcmToken = await _fcmService.getToken();
+    // if (fcmToken != null) {
+    //   debugPrint("FCM TOKEN: $fcmToken");
+    //   // TODO: send to backend if endpoint exists
+    // }
 
     _fcmService.listenTokenRefresh((newToken) {
       debugPrint("FCM Token refreshed: $newToken");

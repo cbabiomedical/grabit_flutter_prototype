@@ -51,7 +51,7 @@ class _PointsScreenState extends State<PointsScreen> {
   // MAIN CONTENT
   // --------------------------
   Widget _buildContent(PointsProvider provider, ThemeData theme) {
-    final points = provider.points?.totalPoints ?? 0;
+    final points = provider.points?.loyaltyPoints ?? 0;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
