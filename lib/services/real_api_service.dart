@@ -177,7 +177,7 @@ class RealApiService {
     required String machineId,
     required String authToken,
   }) async {
-    final url = Uri.parse("$baseUrl/beacon/session/start");
+    final url = Uri.parse("$baseUrl/session/start");
 
     final response = await http.post(
       url,
