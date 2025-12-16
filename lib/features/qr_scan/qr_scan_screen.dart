@@ -171,7 +171,7 @@ class _QrScanScreenState extends State<QrScanScreen>
 
     debugPrint("Auto-close scheduled (3 seconds)");
 
-    Future.delayed(const Duration(seconds: 3), () async {
+    Future.delayed(const Duration(seconds: 5), () async {
       if (!mounted) return;
 
       debugPrint("Closing QR screen safely");
