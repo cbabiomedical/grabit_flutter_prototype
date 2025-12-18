@@ -7,6 +7,7 @@
 
     <!-- Location required for BLE scanning (pre-Android 12) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
     <!-- Android 12+ new BLUETOOTH permissions -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />

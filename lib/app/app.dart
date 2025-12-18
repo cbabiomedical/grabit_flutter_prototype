@@ -14,6 +14,7 @@ import '../services/mock_api_service.dart';
 import '../services/real_api_service.dart';
 import '../services/device_service.dart';
 import '../services/beacon_service.dart';
+import '../services/local_notification_service.dart';
 
 // Screens
 import '../features/splash/splash_screen.dart';
@@ -101,6 +102,7 @@ class GrabItApp extends StatelessWidget {
 
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey, //REQUIRED FOR NOTIFICATION TAP
         title: 'GrabIt',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.light,
