@@ -4,6 +4,7 @@ import '../../providers/beacon_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../app/app_routes.dart';
 import '../../services/local_notification_service.dart';
+import '../../services/permission_service.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -59,6 +60,25 @@ class SettingsScreen extends StatelessWidget {
                     beacon.notifyListeners();
                   },
                 ),
+                ListTile(
+                  leading: const Icon(Icons.location_on, color: Colors.teal),
+                  title: const Text("Enable Location Services"),
+                  subtitle: const Text("Required to detect nearby machines"),
+                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () async {
+                    await PermissionService.openGpsSettings();
+                  },
+                ),
+
+                ListTile(
+                  leading: const Icon(Icons.security, color: Colors.teal),
+                  title: const Text("Request Permissions"),
+                  subtitle: const Text("Bluetooth & Location"),
+                  onTap: () async {
+                    await PermissionService.requestBlePermissions();
+                  },
+                ),
+
               ],
             ),
 

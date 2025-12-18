@@ -33,8 +33,8 @@ class BeaconProvider extends ChangeNotifier {
     required this.api,
     required this.auth,
   }) {
-    // Start BLE scanning
-    startScanning();
+    // // Start BLE scanning
+    // startScanning();
   }
 
   void startScanning() {

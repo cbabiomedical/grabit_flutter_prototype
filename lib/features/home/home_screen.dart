@@ -24,6 +24,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _index = 0;
 
+  bool _gpsEnabled = true;
+  bool _permissionGranted = true;
+  bool _checkedEnv = false;
+
   final _screens = const [
     _HomeTab(),
     PromotionScreen(),
@@ -35,7 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _requestPermissions();
+    // _requestPermissions();
+    _initPermissions();
     _printFcmToken();
   }
 
@@ -44,14 +49,51 @@ class _HomeScreenState extends State<HomeScreen> {
     debugPrint("FCM TOKEN: $token");
   }
 
-  Future<void> _requestPermissions() async {
-    await PermissionService.requestBlePermissions();
+  // Future<void> _requestPermissions() async {
+  //   await PermissionService.requestBlePermissions();
+  //
+  //   final enabled = await Geolocator.isLocationServiceEnabled();
+  //   if (!enabled) {
+  //     // show dialog → enable GPS
+  //     await Geolocator.openLocationSettings();
+  //   }
+  // }
 
-    final enabled = await Geolocator.isLocationServiceEnabled();
-    if (!enabled) {
-      // show dialog → enable GPS
-      await Geolocator.openLocationSettings();
+  Future<void> _initPermissions() async {
+    final granted = await PermissionService.requestBlePermissions();
+
+    if (!granted) {
+      debugPrint("BLE permissions not granted");
+      return;
     }
+
+    final gps = await PermissionService.isGpsEnabled();
+
+    if (!gps) {
+      debugPrint("GPS is OFF");
+      return;
+    }
+
+    debugPrint("Permissions + GPS OK → starting scan");
+
+    if (!mounted) return;
+
+    if (mounted) {
+      setState(() {
+        _permissionGranted = granted;
+        _gpsEnabled = gps;
+        _checkedEnv = true;
+      });
+    }
+
+    if (granted && gps && mounted) {
+      context.read<BeaconProvider>().startScanning();
+    }
+
+    // setState(() {
+    //   _permissionGranted = granted;
+    //   _gpsEnabled = gps;
+    // });
   }
 
   @override
@@ -95,6 +137,20 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _screens[_index],
 
+            if (_checkedEnv && (!_gpsEnabled || !_permissionGranted))
+              Positioned(
+                top: 16,
+                left: 16,
+                right: 16,
+                child: _PermissionWarningBanner(
+                  onEnable: () async {
+                    await PermissionService.openGpsSettings();
+                    await Future.delayed(const Duration(seconds: 2));
+                    _initPermissions(); // re-check + restart scan
+                  },
+                ),
+              ),
+
             if (beacon.isNear)
               Positioned(
                 bottom: 110,
@@ -109,6 +165,49 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavBar(
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
+      ),
+    );
+  }
+}
+
+class _PermissionWarningBanner extends StatelessWidget {
+  final VoidCallback onEnable;
+
+  const _PermissionWarningBanner({required this.onEnable});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.orange.shade700,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.location_off, color: Colors.white),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Text(
+              "Enable Location & Permissions to detect nearby machines",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          TextButton(
+            onPressed: onEnable,
+            child: const Text(
+              "Enable",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
       ),
     );
   }
