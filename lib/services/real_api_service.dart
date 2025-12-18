@@ -105,7 +105,7 @@ class RealApiService {
     final url = Uri.parse("$baseUrl/detected");
 
     // -----------------------------
-    // 🔍 DEBUG: REQUEST LOGS
+    // DEBUG: REQUEST LOGS
     // -----------------------------
     debugPrint("📡 Beacon API REQUEST");
     debugPrint("userId=$userId");
@@ -131,10 +131,10 @@ class RealApiService {
     );
 
     // -----------------------------
-    // 🔍 DEBUG: RESPONSE LOGS
+    // DEBUG: RESPONSE LOGS
     // -----------------------------
-    debugPrint("📡 Beacon API RESPONSE ${response.statusCode}");
-    debugPrint("📡 Body: ${response.body}");
+    debugPrint("Beacon API RESPONSE ${response.statusCode}");
+    debugPrint("Body: ${response.body}");
 
     // if (response.statusCode != 200) {
     //   throw Exception("Beacon detected failed: ${response.body}");

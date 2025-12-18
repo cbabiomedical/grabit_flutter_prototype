@@ -10,7 +10,6 @@ import '../providers/beacon_provider.dart';
 import '../providers/settings_provider.dart';
 
 // Services
-import '../services/mock_api_service.dart';
 import '../services/real_api_service.dart';
 import '../services/device_service.dart';
 import '../services/beacon_service.dart';
@@ -34,7 +33,6 @@ class GrabItApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mockApi = MockApiService();
     final deviceService = DeviceService();
 
     return MultiProvider(

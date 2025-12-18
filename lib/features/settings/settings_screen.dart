@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/beacon_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../app/app_routes.dart';
+import '../../services/local_notification_service.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -122,6 +123,33 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ),
               ),
+
+            const SizedBox(height: 16),
+
+            // =====================================================
+            // TESTING / DEBUG
+            // =====================================================
+            _SectionCard(
+              title: "Testing",
+              icon: Icons.bug_report,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.notifications_active, color: Colors.teal),
+                  title: const Text("Test Promotion Notification"),
+                  subtitle: const Text("Trigger local notification manually"),
+                  onTap: () {
+                    LocalNotificationService.showBeaconNotification(
+                      beaconName: beacon.lastBeaconName ?? "CBA016",
+                      deviceId: auth.user?.deviceId ?? "UNKNOWN_DEVICE",
+                      machineName: "CBA TEST 1111111111",
+                      rssi: beacon.lastRssi == -999 ? -58 : beacon.lastRssi,
+                      distanceBucket: "MID",
+                    );
+                  },
+                ),
+              ],
+            ),
+
 
             const SizedBox(height: 16),
 

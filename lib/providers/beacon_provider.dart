@@ -13,6 +13,7 @@ class BeaconProvider extends ChangeNotifier {
   String? lastBeaconName;
   String? lastBeaconMac;
   int lastRssi = -999;
+  String? _lastDistanceBucket;
 
   bool isNear = false;
   bool scanningEnabled = true;
@@ -59,23 +60,57 @@ class BeaconProvider extends ChangeNotifier {
 
     final bucket = beaconService.getDistanceBucket(rssi);
 
-    final wasNear = isNear;
+    final previousBucket = _lastDistanceBucket;
+    _lastDistanceBucket = bucket;
+
     isNear = bucket == "NEAR";
 
-    // RESET WHEN USER MOVES AWAY
-    if (!isNear) {
-      _localNotificationSent = false;
+    // Trigger notification if bucket changed
+    if (previousBucket != bucket) {
+      debugPrint(
+        "Distance bucket changed: $previousBucket → $bucket",
+      );
+
+      // 🔔 LOCAL NOTIFICATION FOR ANY BUCKET
+      LocalNotificationService.showBeaconNotification(
+        beaconName: name,
+        deviceId: auth!.user!.deviceId,
+        machineName: name,
+        rssi: rssi,
+        distanceBucket: bucket,
+      );
     }
 
-    // Notify UI only if state changed
-    if (isNear && !wasNear) {
-      qrOpened = false; // reset on new approach
-      notifyListeners();
+    // Reset QR only when entering NEAR
+    if (bucket == "NEAR" && previousBucket != "NEAR") {
+      qrOpened = false;
     }
+
+    notifyListeners();
+
+    // final wasNear = isNear;
+    // isNear = bucket == "NEAR";
+
+    // // RESET WHEN USER MOVES AWAY
+    // if (!isNear) {
+    //   _localNotificationSent = false;
+    // }
+
+    // // Notify UI only if state changed
+    // if (isNear && !wasNear) {
+    //   qrOpened = false; // reset on new approach
+    //   notifyListeners();
+    // }
 
     // Debug log (always visible)
     debugPrint(
       "DETECTED → name=$name mac=$mac rssi=$rssi bucket=$bucket",
+    );
+
+    debugPrint(
+        "📡 BEACON EVENT → userId=${auth!.user!.userId} "
+            "deviceId=${auth!.user!.deviceId} "
+            "beacon=$name rssi=$rssi"
     );
 
     // LOCAL NOTIFICATION (IMMEDIATE)
